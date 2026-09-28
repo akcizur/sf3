@@ -31,13 +31,38 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
       - name: Build
         run: npm run build
 
+      - name: Validate Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f dist/index.html
+          test -f dist/404.html
+          test -d dist/assets
+
+          if grep -R --line-number --fixed-strings "/sf2/" dist; then
+            echo "ERROR: stale /sf2/ base path found in the production artifact."
+            exit 1
+          fi
+
+          asset_count="$(find dist/assets -type f | wc -l)"
+          if [ "$asset_count" -lt 1 ]; then
+            echo "ERROR: Vite produced no assets."
+            exit 1
+          fi
+
+          echo "Validated GitHub Pages artifact with $asset_count asset file(s)."
+
       - name: Add GitHub Pages SPA fallback
         run: cp dist/index.html dist/404.html
+
+      - name: Re-validate SPA fallback
+        run: cmp -s dist/index.html dist/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
