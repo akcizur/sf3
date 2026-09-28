@@ -129,17 +129,74 @@ export default function ProductPage() {
           </div>
 
           <div className="pt-8">
-            {[
-              ["description", "Popis", <p key="description" className="text-sm leading-7 text-muted-foreground">{product.description}</p>],
-              ["features", "Hlavní vlastnosti", <ul key="features" className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">{product.features.map((feature) => <li key={feature} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{feature}</li>)}</ul>],
-              ["specs", "Specifikace", <dl key="specs" className="grid grid-cols-2 gap-y-3 text-sm">{Object.entries(product.specs).map(([key, value]) => <div key={key}><dt className="text-muted-foreground">{key}</dt><dd className="pt-1">{value}</dd></div>)}</dl>],
-              ["reviews", "Hodnocení", <div key="reviews" className="space-y-4">{product.reviews.map((review) => <article key={review.author + review.title} className="rounded-2xl bg-card p-4"><div className="flex justify-between gap-4"><div className="text-sm font-medium">{review.title}</div><div className="text-sm" aria-label={review.rating + " z 5 hvězdiček"}>{"★".repeat(review.rating)}</div></div><p className="pt-2 text-sm leading-6 text-muted-foreground">{review.body}</p><p className="pt-3 text-xs text-muted-foreground">{review.author}</p></article>)}</div>,
-            ].map(([id, title, content]) => (
-              <section key={id as string} className="border-t border-border/70">
-                <button type="button" onClick={() => setOpenPanel(openPanel === id ? null : id as string)} className="flex w-full items-center justify-between py-5 text-left text-sm font-medium">{title as string}<ChevronDown className={"size-4 transition " + (openPanel === id ? "rotate-180" : "")} /></button>
-                {openPanel === id ? <div className="pb-6">{content}</div> : null}
-              </section>
-            ))}
+            <section className="border-t border-border/70">
+              <button type="button" onClick={() => setOpenPanel(openPanel === "description" ? null : "description")} className="flex w-full items-center justify-between py-5 text-left text-sm font-medium">
+                Popis
+                <ChevronDown className={"size-4 transition " + (openPanel === "description" ? "rotate-180" : "")} />
+              </button>
+              {openPanel === "description" ? <div className="pb-6"><p className="text-sm leading-7 text-muted-foreground">{product.description}</p></div> : null}
+            </section>
+
+            <section className="border-t border-border/70">
+              <button type="button" onClick={() => setOpenPanel(openPanel === "features" ? null : "features")} className="flex w-full items-center justify-between py-5 text-left text-sm font-medium">
+                Hlavní vlastnosti
+                <ChevronDown className={"size-4 transition " + (openPanel === "features" ? "rotate-180" : "")} />
+              </button>
+              {openPanel === "features" ? (
+                <div className="pb-6">
+                  <ul className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+                    {product.features.map((feature) => (
+                      <li key={feature} className="flex gap-2">
+                        <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </section>
+
+            <section className="border-t border-border/70">
+              <button type="button" onClick={() => setOpenPanel(openPanel === "specs" ? null : "specs")} className="flex w-full items-center justify-between py-5 text-left text-sm font-medium">
+                Specifikace
+                <ChevronDown className={"size-4 transition " + (openPanel === "specs" ? "rotate-180" : "")} />
+              </button>
+              {openPanel === "specs" ? (
+                <div className="pb-6">
+                  <dl className="grid grid-cols-2 gap-y-3 text-sm">
+                    {Object.entries(product.specs).map(([key, value]) => (
+                      <div key={key}>
+                        <dt className="text-muted-foreground">{key}</dt>
+                        <dd className="pt-1">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ) : null}
+            </section>
+
+            <section className="border-t border-border/70">
+              <button type="button" onClick={() => setOpenPanel(openPanel === "reviews" ? null : "reviews")} className="flex w-full items-center justify-between py-5 text-left text-sm font-medium">
+                Hodnocení
+                <ChevronDown className={"size-4 transition " + (openPanel === "reviews" ? "rotate-180" : "")} />
+              </button>
+              {openPanel === "reviews" ? (
+                <div className="pb-6 space-y-4">
+                  {product.reviews.map((review) => (
+                    <article key={review.author + review.title} className="rounded-2xl bg-card p-4">
+                      <div className="flex justify-between gap-4">
+                        <div className="text-sm font-medium">{review.title}</div>
+                        <div className="text-sm" aria-label={review.rating + " z 5 hvězdiček"}>
+                          {"★".repeat(review.rating)}
+                        </div>
+                      </div>
+                      <p className="pt-2 text-sm leading-6 text-muted-foreground">{review.body}</p>
+                      <p className="pt-3 text-xs text-muted-foreground">{review.author}</p>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </section>
           </div>
         </div>
       </div>
