@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronDown, Heart, Minus, Plus, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { getCategory, getProduct, getRelatedProducts } from "@/lib/catalog.ts";
 import { formatPrice } from "@/lib/commerce.ts";
@@ -15,6 +16,12 @@ import NotFound from "../NotFound.tsx";
 import { useSeo } from "@/lib/seo.ts";
 import { track } from "@/lib/analytics.ts";
 import { toast } from "sonner";
+
+const PRODUCT_TRUST_ITEMS: Array<{ icon: LucideIcon; title: string; text: string; tone: string }> = [
+  { icon: Truck, title: "Rychlé odeslání", text: "3–7 pracovních dnů", tone: "text-info" },
+  { icon: RotateCcw, title: "Snadné vrácení", text: "14 dní", tone: "text-success" },
+  { icon: ShieldCheck, title: "Bezpečný nákup", text: "Chráněná platba", tone: "text-success" },
+];
 
 export default function ProductPage() {
   const { slug = "" } = useParams();
@@ -134,15 +141,11 @@ export default function ProductPage() {
           </div>
 
           <div className="grid gap-3 pt-7 sm:grid-cols-3">
-            {[
-              [Truck, "Rychlé odeslání", "3–7 pracovních dnů", "text-info"],
-              [RotateCcw, "Snadné vrácení", "14 dní", "text-success"],
-              [ShieldCheck, "Bezpečný nákup", "Chráněná platba", "text-success"],
-            ].map(([Icon, title, text, tone]) => (
-              <div key={title as string} className="commerce-card rounded-2xl p-4">
+            {PRODUCT_TRUST_ITEMS.map(({ icon: Icon, title, text, tone }) => (
+              <div key={title} className="commerce-card rounded-2xl p-4">
                 <Icon className={"size-4 " + tone} />
-                <p className="pt-3 text-xs font-medium">{title as string}</p>
-                <p className="pt-1 text-xs text-muted-foreground">{text as string}</p>
+                <p className="pt-3 text-xs font-medium">{title}</p>
+                <p className="pt-1 text-xs text-muted-foreground">{text}</p>
               </div>
             ))}
           </div>
