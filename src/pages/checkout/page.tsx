@@ -1,13 +1,14 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, LockKeyhole } from "lucide-react";
+import { ArrowLeft, Check, LockKeyhole, ShieldCheck, Truck } from "lucide-react";
 import { useCart } from "@/hooks/use-cart.tsx";
 import { formatPrice, getShippingCost, FREE_SHIPPING_THRESHOLD } from "@/lib/commerce.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { useSeo } from "@/lib/seo.ts";
 import { track } from "@/lib/analytics.ts";
 import { toast } from "sonner";
+import FreeShippingProgress from "@/components/store/free-shipping-progress.tsx";
 
 export type OrderRecord = {
   id: string;
@@ -64,7 +65,8 @@ export default function CheckoutPage() {
 
   if (!items.length) return (
     <div className="mx-auto max-w-xl py-20 text-center">
-      <Check className="mx-auto size-10" /><h1 className="pt-5 text-3xl font-semibold">Není co objednávat</h1>
+      <Check className="mx-auto size-10 text-success" />
+      <h1 className="pt-5 text-3xl font-semibold">Není co objednávat</h1>
       <p className="pt-2 text-muted-foreground">Košík je právě prázdný.</p>
       <Button asChild className="mt-6 rounded-full"><Link to="/shop">Zpět do obchodu</Link></Button>
     </div>
@@ -74,19 +76,20 @@ export default function CheckoutPage() {
     <div>
       <div className="flex items-center justify-between">
         <Link to="/cart" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" /> Košík</Link>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-3.5" /> Bezpečná pokladna</div>
+        <div className="flex items-center gap-2 text-xs text-info"><LockKeyhole className="size-3.5" /> Bezpečná pokladna</div>
       </div>
 
       <div className="grid gap-10 pt-8 lg:grid-cols-[1fr_360px]">
         <form onSubmit={submit} className="space-y-5">
           <header><p className="text-xs uppercase tracking-[0.25em] text-primary">Pokladna</p><h1 className="pt-2 text-4xl font-semibold tracking-tight">Dokončit objednávku</h1></header>
+
           <div className="flex gap-2 rounded-2xl bg-card p-1">
             <button type="button" onClick={() => setStep(1)} className={"flex-1 rounded-xl px-4 py-2 text-sm " + (step === 1 ? "bg-background shadow-sm" : "text-muted-foreground")}>1. Doručení</button>
             <button type="button" onClick={() => validContact && setStep(2)} className={"flex-1 rounded-xl px-4 py-2 text-sm " + (step === 2 ? "bg-background shadow-sm" : "text-muted-foreground")}>2. Platba</button>
           </div>
 
           {step === 1 ? (
-            <section className="rounded-[28px] bg-card p-6">
+            <section className="commerce-card commerce-top-edge rounded-[28px] p-6">
               <h2 className="text-lg font-semibold">Kontakt a doručení</h2>
               <div className="grid gap-4 pt-5">
                 {[
@@ -98,44 +101,64 @@ export default function CheckoutPage() {
                 ].map(([key, label, type]) => (
                   <label key={key} className="grid gap-1.5 text-sm">
                     <span>{label}</span>
-                    <input type={type} value={form[key as keyof typeof form]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="h-12 rounded-2xl border border-input bg-background px-4 outline-none focus:ring-2 focus:ring-ring/30" required />
+                    <input type={type} value={form[key as keyof typeof form]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="h-12 rounded-2xl border border-input bg-background px-4 outline-none focus:border-ring focus:ring-2 focus:ring-ring/20" required />
                   </label>
                 ))}
               </div>
+
               <div className="pt-6">
                 <p className="text-sm font-medium">Způsob dopravy</p>
-                <div className="mt-3 flex items-center justify-between rounded-2xl border border-foreground bg-background p-4">
-                  <span><span className="block text-sm font-medium">Standardní doručení</span><span className="block pt-1 text-xs text-muted-foreground">3–7 pracovních dnů</span></span>
-                  <span className="text-sm">{shipping === 0 ? "Zdarma" : formatPrice(shipping)}</span>
+                <div className="mt-3 flex items-center justify-between rounded-2xl border border-primary bg-primary/5 p-4">
+                  <span className="flex items-start gap-3">
+                    <span className="flex size-9 items-center justify-center rounded-full bg-info/10 text-info"><Truck className="size-4" /></span>
+                    <span><span className="block text-sm font-medium">Standardní doručení</span><span className="block pt-1 text-xs text-muted-foreground">3–7 pracovních dnů</span></span>
+                  </span>
+                  <span className={"text-sm font-medium " + (shipping === 0 ? "text-success" : "")}>{shipping === 0 ? "Zdarma" : formatPrice(shipping)}</span>
                 </div>
                 {shipping > 0 ? <p className="pt-2 text-xs text-muted-foreground">Doprava zdarma od {formatPrice(FREE_SHIPPING_THRESHOLD)}.</p> : null}
               </div>
-              <Button type="button" className="mt-6 h-12 w-full rounded-full" disabled={!validContact} onClick={() => { setStep(2); track("begin_checkout", { total }); }}>Pokračovat k platbě</Button>
+
+              <Button type="button" className="commerce-cta mt-6 h-12 w-full rounded-full" disabled={!validContact} onClick={() => { setStep(2); track("begin_checkout", { total }); }}>Pokračovat k platbě</Button>
             </section>
           ) : (
-            <section className="rounded-[28px] bg-card p-6">
+            <section className="commerce-card commerce-top-edge rounded-[28px] p-6">
               <h2 className="text-lg font-semibold">Platba</h2>
               <p className="pt-2 text-sm text-muted-foreground">Frontend demo — žádná skutečná platba se neprovádí.</p>
-              <label className="mt-5 flex cursor-pointer items-center justify-between rounded-2xl border border-foreground bg-background p-4">
+              <label className="mt-5 flex cursor-pointer items-center justify-between rounded-2xl border border-primary bg-primary/5 p-4">
                 <span><span className="block text-sm font-medium">Platební karta</span><span className="block pt-1 text-xs text-muted-foreground">Visa · Mastercard · Apple Pay</span></span>
                 <input type="radio" checked={form.payment === "card"} onChange={() => setForm({ ...form, payment: "card" })} />
               </label>
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <Button type="button" variant="outline" className="h-12 rounded-full" onClick={() => setStep(1)}>Zpět</Button>
-                <Button type="submit" className="h-12 rounded-full">Objednat · {formatPrice(total)}</Button>
+                <Button type="submit" className="commerce-cta h-12 rounded-full">Objednat · {formatPrice(total)}</Button>
               </div>
             </section>
           )}
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              [ShieldCheck, "Bezpečná platba", "Připraveno pro platební napojení", "text-success"],
+              [Truck, "Přehledné doručení", "Jasná cena a termín", "text-info"],
+              [Check, "Jednoduché vrácení", "14 dní podle podmínek", "text-success"],
+            ].map(([Icon, title, text, tone]) => (
+              <div key={title as string} className="rounded-2xl bg-secondary/65 p-4">
+                <Icon className={"size-4 " + tone} />
+                <p className="pt-2 text-xs font-semibold">{title as string}</p>
+                <p className="pt-1 text-[11px] leading-4 text-muted-foreground">{text as string}</p>
+              </div>
+            ))}
+          </div>
         </form>
 
-        <aside className="h-fit rounded-[28px] bg-card p-6 lg:sticky lg:top-24">
+        <aside className="commerce-card commerce-top-edge h-fit rounded-[28px] p-6 lg:sticky lg:top-24">
           <h2 className="font-semibold">Shrnutí objednávky</h2>
+          <div className="pt-5"><FreeShippingProgress subtotal={subtotal} compact /></div>
           <div className="space-y-4 pt-5">
             {items.map((item) => <div key={item.key} className="flex gap-3"><img src={item.product.image} alt="" loading="lazy" decoding="async" className="size-14 rounded-xl object-cover" /><div className="min-w-0 flex-1"><p className="truncate text-sm">{item.product.name}</p><p className="pt-1 text-xs text-muted-foreground">Množství: {item.quantity}</p></div><span className="text-sm">{formatPrice(item.product.price * item.quantity)}</span></div>)}
           </div>
           <div className="mt-5 space-y-3 border-t pt-5 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Mezisoučet</span><span>{formatPrice(subtotal)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Doprava</span><span>{shipping === 0 ? "Zdarma" : formatPrice(shipping)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Doprava</span><span className={shipping === 0 ? "font-medium text-success" : ""}>{shipping === 0 ? "Zdarma" : formatPrice(shipping)}</span></div>
             <div className="flex justify-between border-t pt-4 text-base font-semibold"><span>Celkem</span><span>{formatPrice(total)}</span></div>
           </div>
         </aside>
