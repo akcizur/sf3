@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Search, SearchX, SlidersHorizontal, X } from "lucide-react";
 import { NavLink, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button.tsx";
@@ -45,7 +46,6 @@ function FilterContent({ params, setParams }: { params: URLSearchParams; setPara
           ))}
         </div>
       </section>
-
       <section>
         <p className="text-sm font-medium">Price</p>
         <div className="grid grid-cols-2 gap-2 pt-3">
@@ -56,7 +56,6 @@ function FilterContent({ params, setParams }: { params: URLSearchParams; setPara
           <button type="button" onClick={() => update("max", "100")} className={cn("rounded-xl bg-secondary px-3 py-2 text-sm", max === "100" && "bg-foreground text-background")}>Under $100</button>
         </div>
       </section>
-
       <section>
         <p className="text-sm font-medium">Rating</p>
         <div className="space-y-2 pt-3">
@@ -68,7 +67,6 @@ function FilterContent({ params, setParams }: { params: URLSearchParams; setPara
           ))}
         </div>
       </section>
-
       <button type="button" onClick={() => setParams(new URLSearchParams())} className="text-sm font-medium underline underline-offset-4">Reset filters</button>
     </div>
   );
@@ -79,7 +77,6 @@ export default function ShopPage() {
   const [params, setParamsState] = useSearchParams();
   const [mobileFilters, setMobileFilters] = useState(false);
   const current = category ? getCategory(category) : undefined;
-
   const q = params.get("q") ?? "";
   const sortParam = params.get("sort") ?? "featured";
   const sort: SortKey = sortParam in SORTS ? sortParam as SortKey : "featured";
@@ -121,22 +118,15 @@ export default function ShopPage() {
           <div className="text-sm text-muted-foreground">{products.length} {products.length === 1 ? "product" : "products"}</div>
         </div>
       </header>
-
       <div className="flex flex-col gap-6 pt-8 lg:flex-row">
         <aside className="hidden w-56 shrink-0 lg:block">
-          <div className="sticky top-24">
-            <p className="pb-5 text-sm font-semibold">Filters</p>
-            <FilterContent params={params} setParams={updateParams} />
-          </div>
+          <div className="sticky top-24"><p className="pb-5 text-sm font-semibold">Filters</p><FilterContent params={params} setParams={updateParams} /></div>
         </aside>
-
         <div className="min-w-0 flex-1">
           <div className="flex flex-col gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-2 overflow-x-auto pb-1">
               <NavLink end to="/shop" className={({ isActive }) => cn("whitespace-nowrap rounded-full px-3.5 py-2 text-sm", isActive && !category ? "bg-foreground text-background" : "bg-card text-muted-foreground hover:text-foreground")}>All</NavLink>
-              {CATEGORIES.map((item) => (
-                <NavLink key={item.slug} to={"/shop/" + item.slug} className={({ isActive }) => cn("whitespace-nowrap rounded-full px-3.5 py-2 text-sm", isActive ? "bg-foreground text-background" : "bg-card text-muted-foreground hover:text-foreground")}>{item.name}</NavLink>
-              ))}
+              {CATEGORIES.map((item) => <NavLink key={item.slug} to={"/shop/" + item.slug} className={({ isActive }) => cn("whitespace-nowrap rounded-full px-3.5 py-2 text-sm", isActive ? "bg-foreground text-background" : "bg-card text-muted-foreground hover:text-foreground")}>{item.name}</NavLink>)}
             </div>
             <div className="flex gap-2">
               <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
@@ -151,7 +141,6 @@ export default function ShopPage() {
               </Select>
             </div>
           </div>
-
           {q || params.get("availability") || params.get("max") || params.get("rating") ? (
             <div className="flex flex-wrap gap-2 pt-4">
               {q ? <button type="button" onClick={() => setSearch("")} className="rounded-full bg-secondary px-3 py-1.5 text-xs">{q} ×</button> : null}
@@ -159,26 +148,15 @@ export default function ShopPage() {
               {params.get("rating") ? <button type="button" onClick={() => { const n = new URLSearchParams(params); n.delete("rating"); updateParams(n); }} className="rounded-full bg-secondary px-3 py-1.5 text-xs">{params.get("rating")}+ stars ×</button> : null}
             </div>
           ) : null}
-
           {products.length === 0 ? (
-            <Empty className="py-20">
-              <EmptyHeader>
-                <EmptyMedia variant="icon"><SearchX /></EmptyMedia>
-                <EmptyTitle>No products found</EmptyTitle>
-                <EmptyDescription>Try clearing a filter or using a broader search.</EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent><Button className="rounded-full" onClick={() => updateParams(new URLSearchParams())}>Reset filters</Button></EmptyContent>
-            </Empty>
+            <Empty className="py-20"><EmptyHeader><EmptyMedia variant="icon"><SearchX /></EmptyMedia><EmptyTitle>No products found</EmptyTitle><EmptyDescription>Try clearing a filter or using a broader search.</EmptyDescription></EmptyHeader><EmptyContent><Button className="rounded-full" onClick={() => updateParams(new URLSearchParams())}>Reset filters</Button></EmptyContent></Empty>
           ) : (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-10 pt-8 md:gap-x-5 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => <ProductCard key={product.slug} product={product} />)}
-            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 pt-8 md:gap-x-5 lg:grid-cols-3 xl:grid-cols-4">{products.map((product) => <ProductCard key={product.slug} product={product} />)}</div>
           )}
         </div>
       </div>
-
       <Sheet open={mobileFilters} onOpenChange={setMobileFilters}>
-        <SheetContent side="bottom" className="max-h-[82vh] rounded-t-[28px]">
+        <SheetContent side="right" className="w-full sm:max-w-md">
           <SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader>
           <div className="overflow-auto p-6"><FilterContent params={params} setParams={updateParams} /></div>
         </SheetContent>
