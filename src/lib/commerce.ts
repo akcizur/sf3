@@ -25,3 +25,5 @@ export const getFreeShippingProgress = (subtotal: number) =>
 
 export const getFreeShippingRemaining = (subtotal: number) =>
   Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+
+// ci verification
