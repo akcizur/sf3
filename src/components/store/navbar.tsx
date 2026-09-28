@@ -1,5 +1,5 @@
+import { Heart, Search, ShoppingBag, Moon, Sun, UserRound } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
-import { Heart, Menu, Search, ShoppingBag, Moon, Sun, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils.ts";
 import { useCart } from "@/hooks/use-cart.tsx";
 import { useTheme } from "@/hooks/use-theme.ts";
@@ -21,14 +21,9 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 md:px-6 md:pt-5">
       <div className="mx-auto flex h-14 max-w-[1320px] items-center justify-between rounded-[28px] border border-border/70 bg-background/88 px-3 shadow-lg shadow-black/5 backdrop-blur-2xl">
-        <div className="flex items-center gap-2">
-          <button className="flex size-10 items-center justify-center rounded-full hover:bg-accent lg:hidden" aria-label="Open navigation" data-mobile-nav>
-            <Menu className="size-5" />
-          </button>
-          <Link to="/" className="whitespace-nowrap px-2 text-base font-semibold tracking-tight md:text-lg">Maison Terre</Link>
-        </div>
+        <Link to="/" className="whitespace-nowrap px-2 text-base font-semibold tracking-tight md:text-lg">Maison Terre</Link>
 
-        <nav className="hidden items-center gap-1 rounded-full bg-secondary/80 p-1 lg:flex">
+        <nav className="hidden items-center gap-1 rounded-full bg-secondary/80 p-1 lg:flex" aria-label="Primary navigation">
           {LINKS.map((link) => (
             <NavLink
               key={link.to}
