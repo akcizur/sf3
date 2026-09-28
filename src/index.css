@@ -133,12 +133,12 @@
   .text-success { color: var(--success); }
   .text-success-foreground { color: var(--success-foreground); }
   .bg-success { background-color: var(--success); }
-  .bg-success\/10 { background-color: color-mix(in srgb, var(--success) 10%, transparent); }
+  .bg-success\/10 { background-color: var(--secondary); }
   .text-warning { color: var(--warning); }
   .text-warning-foreground { color: var(--warning-foreground); }
   .bg-warning { background-color: var(--warning); }
   .text-info { color: var(--info); }
-  .bg-info\/10 { background-color: color-mix(in srgb, var(--info) 10%, transparent); }
+  .bg-info\/10 { background-color: var(--secondary); }
 
   .commerce-top-edge {
     position: relative;
