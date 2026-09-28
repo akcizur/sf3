@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronDown, Heart, Minus, Plus, RotateCcw, ShieldCheck, Truck } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { getCategory, getProduct, getRelatedProducts } from "@/lib/catalog.ts";
 import { formatPrice } from "@/lib/commerce.ts";
@@ -16,12 +15,6 @@ import NotFound from "../NotFound.tsx";
 import { useSeo } from "@/lib/seo.ts";
 import { track } from "@/lib/analytics.ts";
 import { toast } from "sonner";
-
-const PRODUCT_TRUST_ITEMS: Array<{ icon: LucideIcon; title: string; text: string; tone: string }> = [
-  { icon: Truck, title: "Rychlé odeslání", text: "3–7 pracovních dnů", tone: "text-info" },
-  { icon: RotateCcw, title: "Snadné vrácení", text: "14 dní", tone: "text-success" },
-  { icon: ShieldCheck, title: "Bezpečný nákup", text: "Chráněná platba", tone: "text-success" },
-];
 
 export default function ProductPage() {
   const { slug = "" } = useParams();
@@ -46,7 +39,6 @@ export default function ProductPage() {
   const related = product ? getRelatedProducts(product, 4) : [];
   const discount = product?.compareAtPrice ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
   const available = (product?.stock ?? 0) > 0;
-  const lowStock = available && (product?.stock ?? 0) <= 5;
 
   const jsonLd = useMemo(() => product ? ({
     "@context": "https://schema.org",
@@ -91,7 +83,7 @@ export default function ProductPage() {
   };
 
   return (
-    <div className="pb-10 lg:pb-0">
+    <div>
       <Breadcrumbs items={[{ label: "Domů", to: "/" }, { label: "Obchod", to: "/shop" }, ...(category ? [{ label: category.name, to: "/shop/" + category.slug }] : []), { label: product.name }]} />
 
       <div className="grid gap-10 pt-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(380px,.92fr)] lg:gap-14">
@@ -100,7 +92,7 @@ export default function ProductPage() {
         <div className="lg:pt-3">
           <div className="flex items-center justify-between gap-4">
             <p className="text-xs font-medium uppercase tracking-[0.28em] text-primary">{category?.name}</p>
-            {discount > 0 ? <span className="rounded-full bg-warning px-3 py-1 text-xs font-semibold text-warning-foreground">−{discount} %</span> : null}
+            {discount > 0 ? <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">−{discount} %</span> : null}
           </div>
 
           <h1 className="pt-3 text-4xl font-semibold tracking-tight md:text-5xl">{product.name}</h1>
@@ -109,9 +101,7 @@ export default function ProductPage() {
           <div className="flex flex-wrap items-center gap-3 pt-5">
             <span className="text-2xl font-semibold tabular-nums">{formatPrice(product.price)}</span>
             {product.compareAtPrice ? <span className="text-base text-muted-foreground line-through">{formatPrice(product.compareAtPrice)}</span> : null}
-            <span className="flex items-center gap-1 text-sm text-muted-foreground">
-              <span className="text-warning">★</span> {product.rating.toFixed(1)} · {product.reviewCount} hodnocení
-            </span>
+            <span className="text-sm text-muted-foreground">· {product.rating.toFixed(1)} ★ ({product.reviewCount})</span>
           </div>
 
           <div className="pt-7"><VariantSelector options={product.options} value={options} onChange={setOptions} /></div>
@@ -122,40 +112,28 @@ export default function ProductPage() {
               <span className="w-10 text-center text-sm tabular-nums">{quantity}</span>
               <button type="button" onClick={() => setQuantity((value) => Math.min(Math.max(product.stock, 1), value + 1))} disabled={!available || quantity >= product.stock} className="flex size-10 items-center justify-center rounded-full disabled:opacity-30" aria-label="Zvýšit množství"><Plus className="size-4" /></button>
             </div>
-            <button type="button" disabled={!available || missingOption} onClick={addToCart} className="commerce-cta flex h-12 flex-1 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45">
-              {available ? "Přidat do košíku" : "Vyprodáno"}
-            </button>
-            <button type="button" onClick={toggleWishlist} aria-pressed={has(product.slug)} aria-label={has(product.slug) ? "Odebrat z oblíbených" : "Přidat do oblíbených"} className={"flex size-12 items-center justify-center rounded-full border transition " + (has(product.slug) ? "bg-foreground text-background" : "hover:bg-accent")}>
-              <Heart className={"size-5 " + (has(product.slug) ? "fill-current" : "")} />
-            </button>
+            <button type="button" disabled={!available || missingOption} onClick={addToCart} className="flex h-12 flex-1 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45">{available ? "Přidat do košíku" : "Vyprodáno"}</button>
+            <button type="button" onClick={toggleWishlist} aria-pressed={has(product.slug)} aria-label={has(product.slug) ? "Odebrat z oblíbených" : "Přidat do oblíbených"} className={"flex size-12 items-center justify-center rounded-full border " + (has(product.slug) ? "bg-foreground text-background" : "hover:bg-accent")}><Heart className={"size-5 " + (has(product.slug) ? "fill-current" : "")} /></button>
           </div>
 
-          <div className="pt-3" aria-live="polite">
-            {!available ? (
-              <p className="flex items-center gap-2 text-sm text-muted-foreground"><span className="size-2 rounded-full bg-foreground/30" /> Tento produkt je momentálně vyprodaný.</p>
-            ) : lowStock ? (
-              <p className="flex items-center gap-2 text-sm font-medium text-warning"><span className="size-2 rounded-full bg-warning" /> Zbývá posledních {product.stock} ks.</p>
-            ) : (
-              <p className="flex items-center gap-2 text-sm text-success"><span className="size-2 rounded-full bg-success" /> Skladem · odesíláme do 1–2 pracovních dnů.</p>
-            )}
-          </div>
+          {!available ? <p className="pt-3 text-sm text-muted-foreground">Tento produkt je momentálně vyprodaný.</p> : product.stock <= 5 ? <p className="pt-3 text-sm text-primary">Zbývá posledních {product.stock} ks.</p> : <p className="pt-3 text-sm text-muted-foreground">Skladem · odesíláme do 1–2 pracovních dnů.</p>}
 
           <div className="grid gap-3 pt-7 sm:grid-cols-3">
-            {PRODUCT_TRUST_ITEMS.map(({ icon: Icon, title, text, tone }) => (
-              <div key={title} className="commerce-card rounded-2xl p-4">
-                <Icon className={"size-4 " + tone} />
-                <p className="pt-3 text-xs font-medium">{title}</p>
-                <p className="pt-1 text-xs text-muted-foreground">{text}</p>
-              </div>
+            {[
+              [Truck, "Rychlé odeslání", "3–7 pracovních dnů"],
+              [RotateCcw, "Snadné vrácení", "14 dní"],
+              [ShieldCheck, "Bezpečný nákup", "Chráněná platba"],
+            ].map(([Icon, title, text]) => (
+              <div key={title as string} className="rounded-2xl bg-card p-4"><Icon className="size-4" /><p className="pt-3 text-xs font-medium">{title as string}</p><p className="pt-1 text-xs text-muted-foreground">{text as string}</p></div>
             ))}
           </div>
 
           <div className="pt-8">
             {[
               ["description", "Popis", <p key="description" className="text-sm leading-7 text-muted-foreground">{product.description}</p>],
-              ["features", "Hlavní vlastnosti", <ul key="features" className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">{product.features.map((feature) => <li key={feature} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-success" />{feature}</li>)}</ul>],
+              ["features", "Hlavní vlastnosti", <ul key="features" className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">{product.features.map((feature) => <li key={feature} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{feature}</li>)}</ul>],
               ["specs", "Specifikace", <dl key="specs" className="grid grid-cols-2 gap-y-3 text-sm">{Object.entries(product.specs).map(([key, value]) => <div key={key}><dt className="text-muted-foreground">{key}</dt><dd className="pt-1">{value}</dd></div>)}</dl>],
-              ["reviews", "Hodnocení", <div key="reviews" className="space-y-4">{product.reviews.map((review) => <article key={review.author + review.title} className="commerce-card rounded-2xl p-4"><div className="flex justify-between gap-4"><div className="text-sm font-medium">{review.title}</div><div className="text-sm text-warning" aria-label={review.rating + " z 5 hvězdiček"}>{"★".repeat(review.rating)}</div></div><p className="pt-2 text-sm leading-6 text-muted-foreground">{review.body}</p><p className="pt-3 text-xs text-muted-foreground">{review.author}</p></article>)}</div>,
+              ["reviews", "Hodnocení", <div key="reviews" className="space-y-4">{product.reviews.map((review) => <article key={review.author + review.title} className="rounded-2xl bg-card p-4"><div className="flex justify-between gap-4"><div className="text-sm font-medium">{review.title}</div><div className="text-sm" aria-label={review.rating + " z 5 hvězdiček"}>{"★".repeat(review.rating)}</div></div><p className="pt-2 text-sm leading-6 text-muted-foreground">{review.body}</p><p className="pt-3 text-xs text-muted-foreground">{review.author}</p></article>)}</div>,
             ].map(([id, title, content]) => (
               <section key={id as string} className="border-t border-border/70">
                 <button type="button" onClick={() => setOpenPanel(openPanel === id ? null : id as string)} className="flex w-full items-center justify-between py-5 text-left text-sm font-medium">{title as string}<ChevronDown className={"size-4 transition " + (openPanel === id ? "rotate-180" : "")} /></button>
@@ -164,16 +142,6 @@ export default function ProductPage() {
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="commerce-card fixed inset-x-3 bottom-[5.75rem] z-30 flex items-center gap-3 rounded-2xl p-2.5 shadow-2xl backdrop-blur-xl lg:hidden">
-        <div className="min-w-0 pl-2">
-          <p className="truncate text-xs font-medium">{product.name}</p>
-          <p className="pt-0.5 text-sm font-semibold tabular-nums">{formatPrice(product.price)}</p>
-        </div>
-        <button type="button" disabled={!available || missingOption} onClick={addToCart} className="commerce-cta ml-auto h-11 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground disabled:opacity-45">
-          {available ? "Přidat do košíku" : "Vyprodáno"}
-        </button>
       </div>
 
       {(related.length > 0 || recentlyViewed.length > 0) ? (
