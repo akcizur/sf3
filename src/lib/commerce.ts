@@ -19,9 +19,3 @@ export const formatDate = (value: string | Date) =>
 
 export const getShippingCost = (subtotal: number) =>
   subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING;
-
-export const getFreeShippingProgress = (subtotal: number) =>
-  Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
-
-export const getFreeShippingRemaining = (subtotal: number) =>
-  Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
