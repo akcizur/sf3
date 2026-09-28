@@ -15,6 +15,21 @@
     <link rel="manifest" href="./site.webmanifest" />
     <script>
       (() => {
+        const search = window.location.search;
+        if (search.startsWith("?/")) {
+          const redirect = search.slice(2).replace(/~and~/g, "&");
+          const parts = redirect.split("&");
+          const pathname = parts.shift() ?? "";
+          const query = parts.length ? "?" + parts.join("&") : "";
+          const base = window.location.pathname.endsWith("/")
+            ? window.location.pathname
+            : window.location.pathname + "/";
+          window.history.replaceState(null, "", base + pathname + query + window.location.hash);
+        }
+      })();
+    </script>
+    <script>
+      (() => {
         try {
           const stored = localStorage.getItem("maison-terre-theme");
           const theme = stored === "dark" || stored === "light"
