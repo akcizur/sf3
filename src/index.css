@@ -150,7 +150,7 @@
     position: absolute;
     inset: 0 8% auto;
     height: 1px;
-    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary) 72%, white), transparent);
+    background: linear-gradient(90deg, transparent, rgb(207 90 57 / 72%), transparent);
     opacity: 0.9;
     pointer-events: none;
   }
