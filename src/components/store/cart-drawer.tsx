@@ -4,19 +4,19 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { Button } from "@/components/ui/button.tsx";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty.tsx";
 import { useCart } from "@/hooks/use-cart.tsx";
-import { formatPrice, getShippingCost, FREE_SHIPPING_THRESHOLD } from "@/lib/commerce.ts";
+import { formatPrice, getShippingCost } from "@/lib/commerce.ts";
 import QuantitySelector from "./quantity-selector.tsx";
+import FreeShippingProgress from "./free-shipping-progress.tsx";
 
 export default function CartDrawer() {
   const { items, subtotal, isOpen, setOpen, setQuantity, remove } = useCart();
   const shipping = getShippingCost(subtotal);
   const total = subtotal + shipping;
-  const missingForFree = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 border-l bg-background sm:max-w-[480px]">
-        <SheetHeader className="border-b p-6">
+        <SheetHeader className="commerce-top-edge border-b p-6">
           <SheetTitle className="text-xl">Košík <span className="text-sm font-normal text-muted-foreground">({items.reduce((sum, item) => sum + item.quantity, 0)})</span></SheetTitle>
           <SheetDescription className="sr-only">Položky ve vašem nákupním košíku</SheetDescription>
         </SheetHeader>
@@ -28,9 +28,13 @@ export default function CartDrawer() {
           </Empty>
         ) : (
           <>
+            <div className="border-b px-4 py-4 md:px-6">
+              <FreeShippingProgress subtotal={subtotal} compact />
+            </div>
+
             <ul className="flex-1 space-y-3 overflow-auto p-4 md:p-6">
               {items.map((item) => (
-                <li key={item.key} className="rounded-[22px] bg-card p-3">
+                <li key={item.key} className="commerce-card rounded-[22px] p-3">
                   <div className="flex gap-3">
                     <img src={item.product.image} alt={item.product.name} loading="lazy" decoding="async" className="size-20 shrink-0 rounded-[16px] object-cover" />
                     <div className="min-w-0 flex-1">
@@ -50,14 +54,14 @@ export default function CartDrawer() {
                 </li>
               ))}
             </ul>
-            <div className="space-y-3 border-t p-6">
+
+            <div className="commerce-top-edge space-y-3 border-t p-6">
               <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Mezisoučet</span><span>{formatPrice(subtotal)}</span></div>
-              <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Doprava</span><span>{shipping === 0 ? "Zdarma" : formatPrice(shipping)}</span></div>
+              <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Doprava</span><span className={shipping === 0 ? "font-medium text-success" : ""}>{shipping === 0 ? "Zdarma" : formatPrice(shipping)}</span></div>
               <div className="flex items-center justify-between border-t pt-3"><span className="font-medium">Celkem</span><span className="text-lg font-semibold tabular-nums">{formatPrice(total)}</span></div>
-              {missingForFree > 0 ? <p className="text-xs text-muted-foreground">Do dopravy zdarma zbývá {formatPrice(missingForFree)}.</p> : <p className="text-xs text-muted-foreground">Máte dopravu zdarma.</p>}
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <Button variant="outline" asChild className="h-11 rounded-full"><Link to="/cart" onClick={() => setOpen(false)}>Zobrazit košík</Link></Button>
-                <Button asChild className="h-11 rounded-full"><Link to="/checkout" onClick={() => setOpen(false)}>K pokladně <ArrowRight className="ml-2 size-4" /></Link></Button>
+                <Button asChild className="commerce-cta h-11 rounded-full"><Link to="/checkout" onClick={() => setOpen(false)}>K pokladně <ArrowRight className="ml-2 size-4" /></Link></Button>
               </div>
             </div>
           </>
