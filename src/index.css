@@ -123,29 +123,17 @@
   }
 }
 
-@layer components {
-  .commerce-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    box-shadow: 0 18px 50px -40px rgb(20 14 10 / 35%);
-  }
+@utility commerce-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 50px -40px rgb(20 14 10 / 35%);
+}
 
-  .text-success { color: var(--success); }
-  .text-success-foreground { color: var(--success-foreground); }
-  .bg-success { background-color: var(--success); }
-  .bg-success\/10 { background-color: var(--secondary); }
-  .text-warning { color: var(--warning); }
-  .text-warning-foreground { color: var(--warning-foreground); }
-  .bg-warning { background-color: var(--warning); }
-  .text-info { color: var(--info); }
-  .bg-info\/10 { background-color: var(--secondary); }
+@utility commerce-top-edge {
+  position: relative;
+  overflow: hidden;
 
-  .commerce-top-edge {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .commerce-top-edge::before {
+  &::before {
     content: "";
     position: absolute;
     inset: 0 8% auto;
@@ -154,10 +142,10 @@
     opacity: 0.9;
     pointer-events: none;
   }
+}
 
-  .commerce-cta {
-    box-shadow: 0 12px 28px -18px rgb(207 90 57 / 42%);
-  }
+@utility commerce-cta {
+  box-shadow: 0 12px 28px -18px rgb(207 90 57 / 42%);
 }
 
 @media (prefers-reduced-motion: reduce) {
