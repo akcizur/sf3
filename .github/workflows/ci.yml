@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,6 +36,23 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Validate Vite output
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/index.html
+          test -f dist/404.html
+          test -d dist/assets
+
+          if grep -R --line-number --fixed-strings "/sf2/" dist; then
+            echo "ERROR: stale /sf2/ base path found in the production artifact."
+            exit 1
+          fi
+
+          asset_count="$(find dist/assets -type f | wc -l)"
+          test "$asset_count" -ge 1
+          echo "Validated Vite output with $asset_count asset file(s)."
 
       - name: Upload Pages artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
