@@ -42,7 +42,7 @@
   --popover: #ffffff;
   --popover-foreground: #1b1715;
 
-  /* Commerce palette: warm coral for action, sage for positive states,
+  /* CI verification — commerce palette: warm coral for action, sage for positive states,
      amber for promotion, blue for trust/information. */
   --primary: #cf5a39;
   --primary-foreground: #ffffff;
