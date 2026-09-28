@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maison Terre</title>
+    <script>
+      (() => {
+        const l = window.location;
+        const pathSegmentsToKeep = 1;
+        const pathSegments = l.pathname.split("/");
+        const base = pathSegments.slice(0, 1 + pathSegmentsToKeep).join("/");
+        const route = pathSegments.slice(1 + pathSegmentsToKeep).join("/");
+        const query = l.search
+          ? "&" + l.search.slice(1).replace(/&/g, "~and~")
+          : "";
+        const target = l.protocol + "//" + l.hostname +
+          (l.port ? ":" + l.port : "") +
+          base + "/?/" + route + query + l.hash;
+        l.replace(target);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
