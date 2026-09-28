@@ -160,7 +160,7 @@ export const PRODUCTS: Product[] = [
     brand: "Maison Terre",
     price: 1390,
     category: "home-goods",
-    description: "Ruěně pletený koš z mořské trávy na deky, rostliny i každodenní drobnosti. Pevný, lehký a zcela přírodní.",
+    description: "Ručně pletený koš z mořské trávy na deky, rostliny i každodenní drobnosti. Pevný, lehký a zcela přírodní.",
     shortDescription: "Ruční pletení a přirozený materiál pro klidnější organizaci domova.",
     image: IMAGES[4],
     gallery: [IMAGES[4], IMAGES[0], IMAGES[5]],
