@@ -1,5 +1,5 @@
+import { Camera, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Instagram, Mail } from "lucide-react";
 
 const COLUMNS = [
   { title: "Shop", links: [{ label: "All products", to: "/shop" }, { label: "Home Goods", to: "/shop/home-goods" }, { label: "Kitchen", to: "/shop/kitchen" }, { label: "Accessories", to: "/shop/accessories" }, { label: "Wishlist", to: "/wishlist" }] },
@@ -17,15 +17,13 @@ export default function Footer() {
             <p className="max-w-sm pt-3 text-sm leading-6 text-muted-foreground">Considered goods for a quieter, more deliberate home.</p>
             <div className="flex gap-2 pt-6">
               <a href="mailto:hello@maisonterre.example" className="flex size-10 items-center justify-center rounded-full border border-border hover:bg-accent" aria-label="Email"><Mail className="size-4" /></a>
-              <a href="#" className="flex size-10 items-center justify-center rounded-full border border-border hover:bg-accent" aria-label="Instagram"><Instagram className="size-4" /></a>
+              <a href="#" className="flex size-10 items-center justify-center rounded-full border border-border hover:bg-accent" aria-label="Social media"><Camera className="size-4" /></a>
             </div>
           </div>
           {COLUMNS.map((column) => (
             <div key={column.title}>
               <p className="text-sm font-medium">{column.title}</p>
-              <ul className="space-y-3 pt-4">
-                {column.links.map((link) => <li key={link.label}><Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground">{link.label}</Link></li>)}
-              </ul>
+              <ul className="space-y-3 pt-4">{column.links.map((link) => <li key={link.label}><Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground">{link.label}</Link></li>)}</ul>
             </div>
           ))}
         </div>
