@@ -6,10 +6,16 @@ import { fileURLToPath } from "node:url";
 
 const srcDir = fileURLToPath(new URL("./src", import.meta.url));
 const isGitHubActions = process.env.GITHUB_ACTIONS === "true";
+const repositoryName = process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "";
+const isUserOrOrgPages = repositoryName.endsWith(".github.io");
+
+const base =
+  isGitHubActions && repositoryName && !isUserOrOrgPages
+    ? `/${repositoryName}/`
+    : "/";
 
 export default defineConfig({
-  // GitHub Pages serves this project from /sf2/.
-  base: isGitHubActions ? "/sf2/" : "/",
+  base,
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
