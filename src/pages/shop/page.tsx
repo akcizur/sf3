@@ -45,8 +45,8 @@ function FilterContent({ params, setParams }: { params: URLSearchParams; setPara
       <section>
         <p className="text-sm font-medium">Cena</p>
         <div className="grid grid-cols-2 gap-2 pt-3">
-          <label className="rounded-xl bg-secondary px-3 py-2"><span className="block text-[10px] uppercase tracking-wider text-muted-foreground">Maximum</span><input inputMode="numeric" value={max} onChange={(e) => update("max", e.target.value.replace(/[^0-9]/g, ""))} placeholder="Libovolná" className="w-full bg-transparent text-sm outline-none" /></label>
-          <button type="button" onClick={() => update("max", "1500")} className={cn("rounded-xl bg-secondary px-3 py-2 text-sm", max === "1500" && "bg-foreground text-background")}>Do 1 500 Kč</button>
+          <label className="rounded-xl border border-border/70 bg-secondary px-3 py-2"><span className="block text-[10px] uppercase tracking-wider text-muted-foreground">Maximum</span><input inputMode="numeric" value={max} onChange={(e) => update("max", e.target.value.replace(/[^0-9]/g, ""))} placeholder="Libovolná" className="w-full bg-transparent text-sm outline-none" /></label>
+          <button type="button" onClick={() => update("max", "1500")} className={cn("rounded-xl border border-border/70 bg-secondary px-3 py-2 text-sm transition hover:bg-accent", max === "1500" && "border-foreground bg-foreground text-background")}>Do 1 500 Kč</button>
         </div>
       </section>
       <section>
@@ -100,23 +100,23 @@ export default function ShopPage() {
         <aside className="hidden w-56 shrink-0 lg:block"><div className="sticky top-24"><p className="pb-5 text-sm font-semibold">Filtry</p><FilterContent params={params} setParams={updateParams} /></div></aside>
         <div className="min-w-0 flex-1">
           <div className="flex flex-col gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap gap-2 overflow-x-auto pb-1">
-              <NavLink end to="/shop" className={({ isActive }) => cn("whitespace-nowrap rounded-full px-3.5 py-2 text-sm", isActive && !category ? "bg-foreground text-background" : "bg-card text-muted-foreground hover:text-foreground")}>Vše</NavLink>
-              {CATEGORIES.map((item) => <NavLink key={item.slug} to={"/shop/" + item.slug} className={({ isActive }) => cn("whitespace-nowrap rounded-full px-3.5 py-2 text-sm", isActive ? "bg-foreground text-background" : "bg-card text-muted-foreground hover:text-foreground")}>{item.name}</NavLink>)}
+            <div className="flex min-w-0 gap-2 overflow-x-auto pb-1 pr-1">
+              <NavLink end to="/shop" className={({ isActive }) => cn("shrink-0 whitespace-nowrap rounded-full border border-border/70 px-3.5 py-2 text-sm transition", isActive && !category ? "bg-foreground text-background" : "bg-card text-muted-foreground hover:text-foreground")}>Vše</NavLink>
+              {CATEGORIES.map((item) => <NavLink key={item.slug} to={"/shop/" + item.slug} className={({ isActive }) => cn("shrink-0 whitespace-nowrap rounded-full border border-border/70 px-3.5 py-2 text-sm transition", isActive ? "bg-foreground text-background" : "bg-card text-muted-foreground hover:text-foreground")}>{item.name}</NavLink>)}
             </div>
-            <div className="flex gap-2">
-              <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none"><Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><input value={q} onChange={(e) => setSearch(e.target.value)} placeholder="Hledat produkty" className="h-10 w-full rounded-full bg-card pl-10 pr-9 text-sm outline-none focus:ring-2 focus:ring-ring/30" aria-label="Hledat produkty" />{q ? <button type="button" onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Vymazat hledání"><X className="size-4" /></button> : null}</div>
-              <button type="button" onClick={() => setMobileFilters(true)} className="flex h-10 items-center gap-2 rounded-full bg-card px-4 text-sm lg:hidden"><SlidersHorizontal className="size-4" /> Filtry</button>
-              <Select value={sort} onValueChange={(value) => { const next = new URLSearchParams(params); next.set("sort", value); updateParams(next); }}><SelectTrigger className="h-10 w-48 rounded-full border-0 bg-card px-4"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(SORTS).map(([value, item]) => <SelectItem key={value} value={value}>{item.label}</SelectItem>)}</SelectContent></Select>
+            <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+              <div className="relative w-full sm:w-64 sm:flex-none"><Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><input value={q} onChange={(e) => setSearch(e.target.value)} placeholder="Hledat produkty" className="h-10 w-full rounded-full border border-border/70 bg-card pl-10 pr-9 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20" aria-label="Hledat produkty" />{q ? <button type="button" onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Vymazat hledání"><X className="size-4" /></button> : null}</div>
+              <button type="button" onClick={() => setMobileFilters(true)} className="flex h-10 items-center gap-2 rounded-full border border-border/70 bg-card px-4 text-sm transition hover:bg-accent lg:hidden"><SlidersHorizontal className="size-4" /> Filtry</button>
+              <Select value={sort} onValueChange={(value) => { const next = new URLSearchParams(params); next.set("sort", value); updateParams(next); }}><SelectTrigger className="h-10 w-full rounded-full border border-border/70 bg-card px-4 sm:w-48"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(SORTS).map(([value, item]) => <SelectItem key={value} value={value}>{item.label}</SelectItem>)}</SelectContent></Select>
             </div>
           </div>
 
           {q || params.get("availability") || params.get("max") || params.get("rating") ? (
             <div className="flex flex-wrap gap-2 pt-4">
-              {q ? <button type="button" onClick={() => setSearch("")} className="rounded-full bg-secondary px-3 py-1.5 text-xs">{q} ×</button> : null}
-              {params.get("availability") ? <button type="button" onClick={() => { const n = new URLSearchParams(params); n.delete("availability"); updateParams(n); }} className="rounded-full bg-secondary px-3 py-1.5 text-xs">Skladem ×</button> : null}
-              {params.get("max") ? <button type="button" onClick={() => { const n = new URLSearchParams(params); n.delete("max"); updateParams(n); }} className="rounded-full bg-secondary px-3 py-1.5 text-xs">Do {params.get("max")} Kč ×</button> : null}
-              {params.get("rating") ? <button type="button" onClick={() => { const n = new URLSearchParams(params); n.delete("rating"); updateParams(n); }} className="rounded-full bg-secondary px-3 py-1.5 text-xs">{params.get("rating")}+ ★ ×</button> : null}
+              {q ? <button type="button" onClick={() => setSearch("")} className="rounded-full border border-border/70 bg-secondary px-3 py-1.5 text-xs transition hover:bg-accent">{q} ×</button> : null}
+              {params.get("availability") ? <button type="button" onClick={() => { const n = new URLSearchParams(params); n.delete("availability"); updateParams(n); }} className="rounded-full border border-border/70 bg-secondary px-3 py-1.5 text-xs transition hover:bg-accent">Skladem ×</button> : null}
+              {params.get("max") ? <button type="button" onClick={() => { const n = new URLSearchParams(params); n.delete("max"); updateParams(n); }} className="rounded-full border border-border/70 bg-secondary px-3 py-1.5 text-xs transition hover:bg-accent">Do {params.get("max")} Kč ×</button> : null}
+              {params.get("rating") ? <button type="button" onClick={() => { const n = new URLSearchParams(params); n.delete("rating"); updateParams(n); }} className="rounded-full border border-border/70 bg-secondary px-3 py-1.5 text-xs transition hover:bg-accent">{params.get("rating")}+ ★ ×</button> : null}
             </div>
           ) : null}
 
@@ -128,7 +128,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      <Sheet open={mobileFilters} onOpenChange={setMobileFilters}><SheetContent side="right" className="w-full sm:max-w-md"><SheetHeader><SheetTitle>Filtry</SheetTitle></SheetHeader><div className="overflow-auto p-6"><FilterContent params={params} setParams={updateParams} /></div></SheetContent></Sheet>
+      <Sheet open={mobileFilters} onOpenChange={setMobileFilters}><SheetContent side="right" className="w-full border-l border-border/70 bg-background sm:max-w-md"><SheetHeader><SheetTitle>Filtry</SheetTitle></SheetHeader><div className="overflow-auto p-6"><FilterContent params={params} setParams={updateParams} /></div></SheetContent></Sheet>
     </div>
   );
 }
