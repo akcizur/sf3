@@ -2,19 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#FAF7F2" />
-    <title>Maison Terre</title>
+    <meta name="format-detection" content="telephone=no" />
     <meta name="description" content="Considered goods for a quieter home." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet" />
+    <meta property="og:title" content="Maison Terre" />
+    <meta property="og:description" content="Considered goods for a quieter home." />
+    <meta property="og:type" content="website" />
+    <title>Maison Terre</title>
+    <link rel="manifest" href="./site.webmanifest" />
     <script>
       (() => {
         try {
           const stored = localStorage.getItem("maison-terre-theme");
-          const theme = stored === "dark" || stored === "light" ? stored : "light";
+          const theme = stored === "dark" || stored === "light"
+            ? stored
+            : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
           document.documentElement.dataset.theme = theme;
           document.documentElement.style.colorScheme = theme;
         } catch {

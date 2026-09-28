@@ -1,21 +1,61 @@
+import { ArrowRight, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatPrice, type Product } from "@/lib/catalog.ts";
+import WishlistButton from "./wishlist-button.tsx";
+import { useCart } from "@/hooks/use-cart.tsx";
+import { toast } from "sonner";
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { add } = useCart();
+  const soldOut = product.stock < 1;
+
   return (
-    <Link to={`/product/${product.slug}`} className="group block cursor-pointer">
-      <div className="aspect-square overflow-hidden rounded-[24px] bg-card">
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          className="size-full object-cover transition duration-500 group-hover:scale-105"
-        />
+    <article className="group">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[24px] bg-card">
+        <Link to={"/product/" + product.slug} className="absolute inset-0">
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            className="size-full object-cover transition duration-700 group-hover:scale-[1.035]"
+          />
+        </Link>
+        <div className="absolute left-3 top-3 flex gap-2">
+          {product.badges.slice(0, 1).map((badge) => (
+            <span key={badge} className="rounded-full bg-background/90 px-2.5 py-1 text-[11px] font-medium backdrop-blur">{badge}</span>
+          ))}
+        </div>
+        <div className="absolute right-3 top-3">
+          <WishlistButton slug={product.slug} compact />
+        </div>
+        {!soldOut && (
+          <button
+            type="button"
+            onClick={() => { add(product.slug, 1, Object.fromEntries(product.options.map((option) => [option.name, option.values[0]]))); toast.success("Added to cart"); }}
+            className="absolute inset-x-3 bottom-3 hidden items-center justify-between rounded-full bg-background/92 px-4 py-3 text-sm font-medium shadow-lg backdrop-blur transition group-hover:flex"
+          >
+            Quick add <ArrowRight className="size-4" />
+          </button>
+        )}
+        {soldOut && (
+          <span className="absolute inset-x-3 bottom-3 rounded-full bg-background/92 px-4 py-3 text-center text-sm font-medium backdrop-blur">Sold out</span>
+        )}
+        <Link to={"/product/" + product.slug} className="absolute bottom-3 right-3 hidden size-10 items-center justify-center rounded-full border border-border/70 bg-background/92 shadow-lg backdrop-blur group-hover:flex" aria-label={"View " + product.name}>
+          <Eye className="size-4" />
+        </Link>
       </div>
-      <div className="flex items-baseline justify-between gap-3 px-1 pt-4">
-        <h3 className="truncate text-sm font-medium">{product.name}</h3>
-        <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{formatPrice(product.price)}</span>
+
+      <div className="flex items-start justify-between gap-3 px-1 pt-4">
+        <Link to={"/product/" + product.slug} className="min-w-0">
+          <p className="text-xs text-muted-foreground">{product.brand}</p>
+          <h3 className="truncate pt-1 text-sm font-medium">{product.name}</h3>
+          <div className="flex items-center gap-2 pt-1.5">
+            <span className="text-sm tabular-nums">{formatPrice(product.price)}</span>
+            {product.compareAtPrice ? <span className="text-xs text-muted-foreground line-through">{formatPrice(product.compareAtPrice)}</span> : null}
+          </div>
+        </Link>
+        <span className="pt-1 text-xs text-muted-foreground">{product.rating.toFixed(1)} ★</span>
       </div>
-    </Link>
+    </article>
   );
 }

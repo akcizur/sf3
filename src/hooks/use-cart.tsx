@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getProduct, type Product } from "@/lib/catalog.ts";
+import { track } from "@/lib/analytics.ts";
 
-type CartLine = { slug: string; quantity: number };
+export type CartOptions = Record<string, string>;
+type CartLine = { key: string; slug: string; quantity: number; options: CartOptions };
 type CartItem = CartLine & { product: Product };
 type CartContextValue = {
   items: CartItem[];
@@ -9,36 +11,56 @@ type CartContextValue = {
   subtotal: number;
   isOpen: boolean;
   setOpen: (open: boolean) => void;
-  add: (slug: string, quantity: number) => void;
-  setQuantity: (slug: string, quantity: number) => void;
-  remove: (slug: string) => void;
+  add: (slug: string, quantity: number, options?: CartOptions) => void;
+  setQuantity: (key: string, quantity: number) => void;
+  remove: (key: string) => void;
+  clear: () => void;
 };
 
-const STORAGE_KEY = "maison-terre-cart";
+const STORAGE_KEY = "maison-terre-cart-v2";
 const MAX_QUANTITY = 99;
 const CartContext = createContext<CartContextValue | null>(null);
 
-function sanitizeQuantity(value: unknown): number {
+function makeKey(slug: string, options: CartOptions = {}) {
+  const suffix = Object.entries(options)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => key + "=" + value)
+    .join("&");
+  return slug + "|" + suffix;
+}
+
+function sanitizeQuantity(value: unknown) {
   if (typeof value !== "number" || !Number.isFinite(value)) return 0;
   return Math.min(MAX_QUANTITY, Math.max(0, Math.floor(value)));
 }
 
+function sanitizeOptions(value: unknown): CartOptions {
+  if (!value || typeof value !== "object") return {};
+  return Object.fromEntries(
+    Object.entries(value).filter(([key, item]) => typeof key === "string" && typeof item === "string"),
+  );
+}
+
 function sanitizeLines(value: unknown): CartLine[] {
   if (!Array.isArray(value)) return [];
-
-  const merged = new Map<string, number>();
-
+  const merged = new Map<string, CartLine>();
   for (const entry of value) {
     if (!entry || typeof entry !== "object") continue;
-
-    const slug = "slug" in entry && typeof entry.slug === "string" ? entry.slug : "";
-    const quantity = sanitizeQuantity("quantity" in entry ? entry.quantity : 0);
-
+    const raw = entry as Record<string, unknown>;
+    const slug = typeof raw.slug === "string" ? raw.slug : "";
+    const quantity = sanitizeQuantity(raw.quantity);
     if (!slug || quantity < 1 || !getProduct(slug)) continue;
-    merged.set(slug, Math.min(MAX_QUANTITY, (merged.get(slug) ?? 0) + quantity));
+    const options = sanitizeOptions(raw.options);
+    const key = typeof raw.key === "string" ? raw.key : makeKey(slug, options);
+    const current = merged.get(key);
+    merged.set(key, {
+      key,
+      slug,
+      options,
+      quantity: Math.min(MAX_QUANTITY, (current?.quantity ?? 0) + quantity),
+    });
   }
-
-  return [...merged.entries()].map(([slug, quantity]) => ({ slug, quantity }));
+  return [...merged.values()];
 }
 
 function loadCart(): CartLine[] {
@@ -55,11 +77,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setOpen] = useState(false);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
-    } catch {
-      // Storage can be unavailable or full; the in-memory cart still works.
-    }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(lines)); } catch {}
   }, [lines]);
 
   const value = useMemo<CartContextValue>(() => {
@@ -74,36 +92,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       subtotal: items.reduce((sum, item) => sum + item.quantity * item.product.price, 0),
       isOpen,
       setOpen,
-      add: (slug, quantity) => {
+      add: (slug, quantity, options = {}) => {
         const product = getProduct(slug);
         const safeQuantity = sanitizeQuantity(quantity);
-
         if (!product || safeQuantity < 1) return;
-
+        const key = makeKey(slug, options);
         setLines((prev) => {
-          const current = prev.find((line) => line.slug === slug);
-          if (!current) return [...prev, { slug, quantity: safeQuantity }];
-
+          const current = prev.find((line) => line.key === key);
+          if (!current) return [...prev, { key, slug, quantity: safeQuantity, options }];
           return prev.map((line) =>
-            line.slug === slug
+            line.key === key
               ? { ...line, quantity: Math.min(MAX_QUANTITY, line.quantity + safeQuantity) }
               : line,
           );
         });
+        track("add_to_cart", { slug, quantity: safeQuantity, options });
         setOpen(true);
       },
-      setQuantity: (slug, quantity) => {
+      setQuantity: (key, quantity) => {
         const safeQuantity = sanitizeQuantity(quantity);
-
         setLines((prev) =>
           safeQuantity < 1
-            ? prev.filter((line) => line.slug !== slug)
-            : prev.map((line) =>
-                line.slug === slug ? { ...line, quantity: safeQuantity } : line,
-              ),
+            ? prev.filter((line) => line.key !== key)
+            : prev.map((line) => line.key === key ? { ...line, quantity: safeQuantity } : line),
         );
       },
-      remove: (slug) => setLines((prev) => prev.filter((line) => line.slug !== slug)),
+      remove: (key) => {
+        setLines((prev) => prev.filter((line) => line.key !== key));
+        track("remove_from_cart", { key });
+      },
+      clear: () => setLines([]),
     };
   }, [lines, isOpen]);
 
