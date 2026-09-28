@@ -29,35 +29,84 @@
 
 :root {
   --radius: 1.25rem;
-  --background: #1a1512;
-  --foreground: #f3eae0;
-  --card: #241b16;
-  --card-foreground: #f3eae0;
-  --popover: #241b16;
-  --popover-foreground: #f3eae0;
-  --primary: #c8794f;
-  --primary-foreground: #1a1512;
-  --secondary: #2e231d;
-  --secondary-foreground: #f3eae0;
-  --muted: #2e231d;
-  --muted-foreground: #a99a8d;
-  --accent: #33271f;
-  --accent-foreground: #f3eae0;
-  --destructive: oklch(0.65 0.2 25);
-  --border: rgb(243 234 224 / 9%);
-  --input: rgb(243 234 224 / 14%);
-  --ring: #c8794f;
+  --background: #FAF7F2;
+  --foreground: #1C1613;
+  --card: #FFFFFF;
+  --card-foreground: #1C1613;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1613;
+  --primary: #8C4B2F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F0EBE5;
+  --secondary-foreground: #1C1613;
+  --muted: #F0EBE5;
+  --muted-foreground: #635750;
+  --accent: #EDE5DD;
+  --accent-foreground: #1C1613;
+  --destructive: oklch(0.58 0.22 25);
+  --border: #E6DDD5;
+  --input: #E6DDD5;
+  --ring: #8C4B2F;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --background: #1C1613;
+  --foreground: #E6DDD5;
+  --card: #29211D;
+  --card-foreground: #E6DDD5;
+  --popover: #29211D;
+  --popover-foreground: #E6DDD5;
+  --primary: #D46A43;
+  --primary-foreground: #1C1613;
+  --secondary: #342923;
+  --secondary-foreground: #E6DDD5;
+  --muted: #342923;
+  --muted-foreground: #A0938A;
+  --accent: #3D312B;
+  --accent-foreground: #E6DDD5;
+  --destructive: oklch(0.68 0.19 25);
+  --border: #3D312B;
+  --input: #3D312B;
+  --ring: #D46A43;
+  color-scheme: dark;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    background: var(--background);
+    transition: background-color 300ms ease, color 300ms ease;
+  }
+
   body {
     @apply bg-background font-sans text-foreground antialiased;
+    min-width: 320px;
+    transition: background-color 300ms ease, color 300ms ease;
   }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }
