@@ -19,10 +19,8 @@ export function InfoCards({ items }: { items: InfoCard[] }) {
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {items.map((c) => (
-        <div key={c.title} className="rounded-[20px] bg-card p-6 shadow-xl shadow-black/30">
-          <div className="flex size-10 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <c.icon className="size-5" />
-          </div>
+        <div key={c.title} className="rounded-[20px] bg-card p-6">
+          <div className="flex size-10 items-center justify-center rounded-full bg-primary/15 text-primary"><c.icon className="size-5" /></div>
           <h3 className="pt-6 font-medium">{c.title}</h3>
           <p className="pt-2 text-sm text-muted-foreground">{c.text}</p>
         </div>
@@ -32,11 +30,5 @@ export function InfoCards({ items }: { items: InfoCard[] }) {
 }
 
 export function Prose({ paragraphs }: { paragraphs: string[] }) {
-  return (
-    <div className="space-y-4 text-muted-foreground">
-      {paragraphs.map((p) => (
-        <p key={p.slice(0, 24)}>{p}</p>
-      ))}
-    </div>
-  );
+  return <div className="space-y-4 leading-7 text-muted-foreground">{paragraphs.map((p) => <p key={p.slice(0, 24)}>{p}</p>)}</div>;
 }
