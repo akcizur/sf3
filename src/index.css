@@ -82,8 +82,12 @@
     padding-bottom: env(safe-area-inset-bottom);
     transition: background-color 250ms ease, color 250ms ease;
   }
+  img { display: block; max-width: 100%; }
+  a { text-underline-offset: 0.2em; }
   button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   input, button, textarea, select { font: inherit; }
+  input::placeholder, textarea::placeholder { color: var(--muted-foreground); opacity: 0.78; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   ::selection { background: var(--primary); color: var(--primary-foreground); }
 }
 
