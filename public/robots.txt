@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://akcizur.github.io/sf3/sitemap.xml
