@@ -13,6 +13,7 @@ type SeoOptions = {
 export function useSeo({ title, description, image, canonical, noindex, type = "website", jsonLd }: SeoOptions) {
   useEffect(() => {
     document.title = title;
+    document.documentElement.lang = "cs";
 
     const upsert = (selector: string, attrs: Record<string, string>, content: string) => {
       let element = document.head.querySelector<HTMLMetaElement>(selector);
@@ -26,6 +27,7 @@ export function useSeo({ title, description, image, canonical, noindex, type = "
 
     if (description) upsert('meta[name="description"]', { name: "description" }, description);
     upsert('meta[name="robots"]', { name: "robots" }, noindex ? "noindex,nofollow" : "index,follow");
+    upsert('meta[property="og:locale"]', { property: "og:locale" }, "cs_CZ");
     upsert('meta[property="og:title"]', { property: "og:title" }, title);
     if (description) upsert('meta[property="og:description"]', { property: "og:description" }, description);
     upsert('meta[property="og:type"]', { property: "og:type" }, type);
@@ -42,7 +44,6 @@ export function useSeo({ title, description, image, canonical, noindex, type = "
     }
 
     document.head.querySelector('script[data-storefront-jsonld="true"]')?.remove();
-
     if (jsonLd) {
       const script = document.createElement("script");
       script.type = "application/ld+json";
