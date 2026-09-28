@@ -1,33 +1,27 @@
 import { Package, RotateCcw, Truck } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion.tsx";
 import InfoPage, { InfoCards } from "@/components/store/info-page.tsx";
+import { formatPrice, FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING } from "@/lib/commerce.ts";
+import { useSeo } from "@/lib/seo.ts";
 
 const FAQ = [
-  { q: "How much does shipping cost?", a: "Standard shipping is a flat $6. Orders over $100 ship free." },
-  { q: "How long does delivery take?", a: "Most orders arrive within 3 to 7 business days. You will receive a tracking link once your order ships." },
-  { q: "What is your return policy?", a: "Unused items can be returned within 30 days of delivery for a full refund." },
-  { q: "How do I start a return?", a: "Contact us with your order number and we will send you a prepaid return label." },
-  { q: "Do you ship internationally?", a: "We currently ship within the US and to most of Europe. International rates are shown at checkout." },
+  { q: "Kolik stojí doprava?", a: "Standardní doprava stojí " + formatPrice(STANDARD_SHIPPING) + ". Při objednávce od " + formatPrice(FREE_SHIPPING_THRESHOLD) + " je doprava zdarma." },
+  { q: "Jak dlouho trvá doručení?", a: "Většinu objednávek doručíme za 3–7 pracovních dnů. Jakmile zásilku odešleme, v produkční verzi obdržíte odkaz pro její sledování." },
+  { q: "Jak funguje vrácení?", a: "Nepoužité zboží můžete podle finálních obchodních podmínek vrátit ve lhůtě 14 dnů." },
+  { q: "Jak zahájím vrácení?", a: "Napište nám číslo objednávky a požadavek na vrácení. V produkční verzi naváže proces podle zvoleného dopravce." },
+  { q: "Kam doručujete?", a: "Tato frontendová verze je připravená pro český storefront. Konkrétní zóny dopravy budou později řízeny backendem." },
 ];
 
 export default function ShippingReturnsPage() {
+  useSeo({ title: "Doprava a vrácení — Maison Terre", description: "Informace o dopravě, doručení a vrácení objednávek." });
   return (
-    <InfoPage eyebrow="Support" title="Shipping & returns" intro="Clear pricing, careful packaging, and an easy return process if something isn't right.">
-      <InfoCards
-        items={[
-          { icon: Truck, title: "Standard shipping", text: "Delivered in 3 to 7 business days. Tracking is emailed once your order ships." },
-          { icon: Package, title: "Careful packaging", text: "Every order is hand-packed with recyclable, plastic-free materials." },
-          { icon: RotateCcw, title: "30-day returns", text: "Not the right fit? Return unused items within 30 days for a full refund." },
-        ]}
-      />
-      <Accordion type="single" collapsible className="rounded-[20px] bg-card px-6 shadow-xl shadow-black/30">
-        {FAQ.map((f) => (
-          <AccordionItem key={f.q} value={f.q}>
-            <AccordionTrigger className="cursor-pointer">{f.q}</AccordionTrigger>
-            <AccordionContent className="text-muted-foreground">{f.a}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+    <InfoPage eyebrow="Podpora" title="Doprava a vrácení" intro="Jasné podmínky, pečlivé balení a jednoduchý proces vrácení.">
+      <InfoCards items={[
+        { icon: Truck, title: "Standardní doprava", text: "3–7 pracovních dnů. Cena " + formatPrice(STANDARD_SHIPPING) + ", doprava zdarma od " + formatPrice(FREE_SHIPPING_THRESHOLD) + "." },
+        { icon: Package, title: "Pečlivé balení", text: "Objednávky balíme šetrně s důrazem na recyklovatelné materiály." },
+        { icon: RotateCcw, title: "14denní vrácení", text: "Nepoužité zboží můžete vrátit podle finálních podmínek obchodu." },
+      ]} />
+      <Accordion type="single" collapsible className="rounded-[20px] bg-card px-6">{FAQ.map((f) => <AccordionItem key={f.q} value={f.q}><AccordionTrigger>{f.q}</AccordionTrigger><AccordionContent className="text-muted-foreground">{f.a}</AccordionContent></AccordionItem>)}</Accordion>
     </InfoPage>
   );
 }
