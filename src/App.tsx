@@ -21,7 +21,7 @@ import ContactPage from "./pages/contact/page.tsx";
 export default function App() {
   return (
     <CartProvider>
-      <Toaster position="bottom-right" richColors theme="dark" />
+      <Toaster position="bottom-right" richColors theme="system" />
       <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route element={<StoreLayout />}>
