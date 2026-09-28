@@ -36,13 +36,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Validate Pages artifact
+      - name: Validate Vite output
         shell: bash
         run: |
           set -euo pipefail
 
           test -f dist/index.html
-          test -f dist/404.html
           test -d dist/assets
 
           if grep -R --line-number --fixed-strings "/sf2/" dist; then
@@ -56,13 +55,17 @@ jobs:
             exit 1
           fi
 
-          echo "Validated GitHub Pages artifact with $asset_count asset file(s)."
+          echo "Validated Vite output with $asset_count asset file(s)."
 
       - name: Add GitHub Pages SPA fallback
         run: cp dist/index.html dist/404.html
 
-      - name: Re-validate SPA fallback
-        run: cmp -s dist/index.html dist/404.html
+      - name: Validate SPA fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dist/404.html
+          cmp -s dist/index.html dist/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
