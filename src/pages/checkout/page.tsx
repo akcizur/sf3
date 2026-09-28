@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, LockKeyhole, ShieldCheck, Truck } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useCart } from "@/hooks/use-cart.tsx";
 import { formatPrice, getShippingCost, FREE_SHIPPING_THRESHOLD } from "@/lib/commerce.ts";
 import { Button } from "@/components/ui/button.tsx";
@@ -21,6 +22,12 @@ export type OrderRecord = {
 };
 
 const ORDERS_KEY = "maison-terre-demo-orders";
+
+const CHECKOUT_TRUST_ITEMS: Array<{ icon: LucideIcon; title: string; text: string; tone: string }> = [
+  { icon: ShieldCheck, title: "Bezpečná platba", text: "Připraveno pro platební napojení", tone: "text-success" },
+  { icon: Truck, title: "Přehledné doručení", text: "Jasná cena a termín", tone: "text-info" },
+  { icon: Check, title: "Jednoduché vrácení", text: "14 dní podle podmínek", tone: "text-success" },
+];
 
 export function loadOrders(): OrderRecord[] {
   try {
@@ -136,15 +143,11 @@ export default function CheckoutPage() {
           )}
 
           <div className="grid gap-3 sm:grid-cols-3">
-            {[
-              [ShieldCheck, "Bezpečná platba", "Připraveno pro platební napojení", "text-success"],
-              [Truck, "Přehledné doručení", "Jasná cena a termín", "text-info"],
-              [Check, "Jednoduché vrácení", "14 dní podle podmínek", "text-success"],
-            ].map(([Icon, title, text, tone]) => (
-              <div key={title as string} className="rounded-2xl bg-secondary/65 p-4">
+            {CHECKOUT_TRUST_ITEMS.map(({ icon: Icon, title, text, tone }) => (
+              <div key={title} className="rounded-2xl bg-secondary/65 p-4">
                 <Icon className={"size-4 " + tone} />
-                <p className="pt-2 text-xs font-semibold">{title as string}</p>
-                <p className="pt-1 text-[11px] leading-4 text-muted-foreground">{text as string}</p>
+                <p className="pt-2 text-xs font-semibold">{title}</p>
+                <p className="pt-1 text-[11px] leading-4 text-muted-foreground">{text}</p>
               </div>
             ))}
           </div>
