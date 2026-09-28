@@ -73,39 +73,23 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  html {
-    background: var(--background);
-    transition: background-color 300ms ease, color 300ms ease;
-  }
-
+  * { @apply border-border outline-ring/50; }
+  html { background: var(--background); scroll-behavior: smooth; }
   body {
     @apply bg-background font-sans text-foreground antialiased;
     min-width: 320px;
-    transition: background-color 300ms ease, color 300ms ease;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+    transition: background-color 250ms ease, color 250ms ease;
   }
-
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
-
-  ::selection {
-    background: var(--primary);
-    color: var(--primary-foreground);
-  }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+  input, button, textarea, select { font: inherit; }
+  ::selection { background: var(--primary); color: var(--primary-foreground); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html,
-  body,
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
